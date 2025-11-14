@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test del Modal de Carpetas</title>
+    <link href="css/administradorClientes.css" rel="stylesheet">
+    <link href="css/visorHistorialArchivos.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        .test-section h3 {
+            color: #00a7b5;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 class="text-center mb-4">
+            <i class="fa fa-folder-open"></i> Test del Modal de Carpetas
+        </h1>
+
+        <!-- Test del Modal de Carpetas -->
+        <div class="test-section">
+            <h3><i class="fa fa-folder"></i> Modal de Estructura de Carpetas</h3>
+            <p>Prueba la funcionalidad del modal de carpetas con datos de ejemplo.</p>
+            
+            <div class="text-center mb-3">
+                <button type="button" class="btn btn-primary btn-lg" onclick="testModal.abrirModalCarpetas()">
+                    <i class="fa fa-folder-open"></i> Abrir Modal de Carpetas
+                </button>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Funcionalidades a probar:</h5>
+                    <ul>
+                        <li>✅ Apertura del modal</li>
+                        <li>✅ Cierre con botón X</li>
+                        <li>✅ Cierre con click fuera</li>
+                        <li>✅ Cierre con tecla Escape</li>
+                        <li>✅ Navegación por carpetas</li>
+                        <li>✅ Selección de carpetas</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h5>Datos de ejemplo:</h5>
+                    <ul>
+                        <li>📁 Plan de Acción Principal</li>
+                        <li>📁 Subcarpeta Nivel 1</li>
+                        <li>📁 Subcarpeta Nivel 2</li>
+                        <li>📁 Subcarpeta Nivel 3</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test de la Tabla de Archivos -->
+        <div class="test-section">
+            <h3><i class="fa fa-file"></i> Tabla de Archivos</h3>
+            <p>Prueba los estilos de la tabla de archivos con datos de ejemplo.</p>
+            
+            <div class="table-responsive">
+                <table class="tabla-archivos-carpeta table w-100">
+                    <thead>
+                        <tr>
+                            <th class="col-nombre">Nombre del Archivo</th>
+                            <th class="col-tipo">Tipo</th>
+                            <th class="col-tamano">Tamaño</th>
+                            <th class="col-comentarios">Comentarios</th>
+                            <th class="col-fecha">Fecha de Subida</th>
+                            <th class="col-usuario">Subido por</th>
+                            <th class="col-acciones">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="col-nombre">
+                                <i class="fa fa-file-pdf icono-tipo-archivo pdf"></i>
+                                Documento_Ejemplo.pdf
+                            </td>
+                            <td class="col-tipo">
+                                <span class="badge badge-secondary">PDF</span>
+                            </td>
+                            <td class="col-tamano">
+                                <span class="tamano-archivo">2.5 MB</span>
+                            </td>
+                            <td class="col-comentarios">Archivo de ejemplo para pruebas</td>
+                            <td class="col-fecha">15/01/2025 10:30</td>
+                            <td class="col-usuario">Usuario Test</td>
+                            <td class="col-acciones">
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-sm btn-ver-archivo" title="Ver archivo">
+                                        <i class="fa fa-eye"></i> Ver
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-descargar-archivo" title="Descargar archivo">
+                                        <i class="fa fa-download"></i> Descargar
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-nombre">
+                                <i class="fa fa-file-excel icono-tipo-archivo excel"></i>
+                                Reporte_Mensual.xlsx
+                            </td>
+                            <td class="col-tipo">
+                                <span class="badge badge-secondary">Excel</span>
+                            </td>
+                            <td class="col-tamano">
+                                <span class="tamano-archivo">1.2 MB</span>
+                            </td>
+                            <td class="col-comentarios">Sin comentarios</td>
+                            <td class="col-fecha">14/01/2025 15:45</td>
+                            <td class="col-usuario">Admin User</td>
+                            <td class="col-acciones">
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-sm btn-ver-archivo" title="Ver archivo">
+                                        <i class="fa fa-eye"></i> Ver
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-descargar-archivo" title="Descargar archivo">
+                                        <i class="fa fa-download"></i> Descargar
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Test de Responsive -->
+        <div class="test-section">
+            <h3><i class="fa fa-mobile"></i> Test Responsive</h3>
+            <p>Prueba la funcionalidad en diferentes tamaños de pantalla.</p>
+            
+            <div class="alert alert-info">
+                <i class="fa fa-info-circle"></i>
+                <strong>Nota:</strong> Redimensiona la ventana del navegador para probar la responsividad del modal y la tabla.
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Carpetas -->
+    <div id="modal_carpetas" class="modal-carpetas">
+        <div class="modal-carpetas-contenido">
+            <div class="modal-carpetas-header">
+                <h5><i class="fa fa-folder"></i> Estructura de Carpetas</h5>
+                <span class="modal-carpetas-cerrar" onclick="testModal.cerrarModalCarpetas()">&times;</span>
+            </div>
+            <div class="modal-carpetas-body">
+                <ul class="lista-carpetas" id="lista_carpetas_modal">
+                    <!-- Se llenará dinámicamente -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        class TestModal {
+            constructor() {
+                this.estructuraEjemplo = [
+                    {
+                        id_carpeta_drive: 'carpeta_1',
+                        nombre_carpeta: 'Plan de Acción Principal',
+                        tipo_carpeta: 'plan_accion',
+                        subcarpetas: [
+                            {
+                                id_carpeta_drive: 'subcarpeta_1_1',
+                                nombre_carpeta: 'Documentos Técnicos',
+                                tipo_carpeta: 'subcarpeta',
+                                subcarpetas: [
+                                    {
+                                        id_carpeta_drive: 'subcarpeta_1_1_1',
+                                        nombre_carpeta: 'Especificaciones',
+                                        tipo_carpeta: 'subcarpeta',
+                                        subcarpetas: []
+                                    },
+                                    {
+                                        id_carpeta_drive: 'subcarpeta_1_1_2',
+                                        nombre_carpeta: 'Planos',
+                                        tipo_carpeta: 'subcarpeta',
+                                        subcarpetas: []
+                                    }
+                                ]
+                            },
+                            {
+                                id_carpeta_drive: 'subcarpeta_1_2',
+                                nombre_carpeta: 'Reportes',
+                                tipo_carpeta: 'subcarpeta',
+                                subcarpetas: [
+                                    {
+                                        id_carpeta_drive: 'subcarpeta_1_2_1',
+                                        nombre_carpeta: 'Reportes Mensuales',
+                                        tipo_carpeta: 'subcarpeta',
+                                        subcarpetas: []
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ];
+                this.configurarEventos();
+            }
+
+            configurarEventos() {
+                // Cerrar modal al hacer click fuera de él
+                window.onclick = (event) => {
+                    const modal = document.getElementById('modal_carpetas');
+                    if (event.target === modal) {
+                        this.cerrarModalCarpetas();
+                    }
+                };
+
+                // Cerrar modal con tecla Escape
+                document.addEventListener('keydown', (event) => {
+                    if (event.key === 'Escape') {
+                        this.cerrarModalCarpetas();
+                    }
+                });
+            }
+
+            abrirModalCarpetas() {
+                const modal = document.getElementById('modal_carpetas');
+                if (modal) {
+                    modal.style.display = 'block';
+                    this.mostrarEstructuraCarpetas();
+                }
+            }
+
+            cerrarModalCarpetas() {
+                const modal = document.getElementById('modal_carpetas');
+                if (modal) {
+                    modal.style.display = 'none';
+                }
+            }
+
+            mostrarEstructuraCarpetas() {
+                const contenedor = document.getElementById('lista_carpetas_modal');
+                if (!contenedor) return;
+
+                let html = '';
+                this.estructuraEjemplo.forEach(carpeta => {
+                    html += this.generarHTMLCarpetaModal(carpeta, 0);
+                });
+
+                contenedor.innerHTML = html;
+            }
+
+            generarHTMLCarpetaModal(carpeta, nivel) {
+                const nivelClass = nivel > 0 ? `nivel-${nivel}` : '';
+                const icono = carpeta.tipo_carpeta === 'plan_accion' ? 'fa-folder' : 'fa-folder';
+                
+                let html = `
+                    <li class="carpeta-modal-item ${nivelClass}" 
+                        data-id-carpeta="${carpeta.id_carpeta_drive}" 
+                        data-tipo="${carpeta.tipo_carpeta}"
+                        onclick="testModal.seleccionarCarpeta('${carpeta.id_carpeta_drive}', '${carpeta.nombre_carpeta}')">
+                        <i class="fa ${icono} icono-carpeta"></i>
+                        <span class="nombre-carpeta">${carpeta.nombre_carpeta}</span>
+                        <span class="contador-archivos">${Math.floor(Math.random() * 10)}</span>
+                    </li>
+                `;
+
+                // Agregar subcarpetas recursivamente
+                if (carpeta.subcarpetas && carpeta.subcarpetas.length > 0) {
+                    carpeta.subcarpetas.forEach(subcarpeta => {
+                        html += this.generarHTMLCarpetaModal(subcarpeta, nivel + 1);
+                    });
+                }
+
+                return html;
+            }
+
+            seleccionarCarpeta(idCarpetaDrive, nombreCarpeta) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Carpeta Seleccionada',
+                    text: `Has seleccionado: ${nombreCarpeta}`,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                
+                // Cerrar modal después de seleccionar
+                setTimeout(() => {
+                    this.cerrarModalCarpetas();
+                }, 1000);
+            }
+        }
+
+        // Inicializar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            window.testModal = new TestModal();
+        });
+    </script>
+</body>
+</html>

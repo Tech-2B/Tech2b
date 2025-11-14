@@ -1,0 +1,506 @@
+/* Estilos específicos para el administrador de clientes */
+
+/* Estilos para el formulario de clientes */
+.form-cliente {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.form-cliente .form-control {
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    transition: border-color 0.3s ease;
+}
+
+.form-cliente .form-control:focus {
+    border-color: #00a7b5;
+    box-shadow: 0 0 0 0.2rem rgba(0, 167, 181, 0.25);
+}
+
+.form-cliente label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.form-cliente label span {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* Estilos para la tabla de clientes */
+.table-clientes {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.table-clientes thead th {
+    background-color: #00a7b5;
+    color: white;
+    font-weight: 600;
+    border: none;
+    padding: 15px 10px;
+}
+
+.table-clientes tbody td {
+    padding: 12px 10px;
+    vertical-align: middle;
+    border-bottom: 1px solid #eee;
+}
+
+.table-clientes tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Estilos para los botones de acción */
+.btn-accion {
+    margin: 3px;
+    min-width: 45px;
+    width: 45px;
+    height: 38px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.btn-accion:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.btn-accion i {
+    font-size: 16px;
+}
+
+/* Espaciado para el grupo de botones */
+.btn-group {
+    gap: 8px !important;
+}
+
+/* Estilos específicos para cada tipo de botón */
+.btn-accion.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-accion.btn-info {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+}
+
+.btn-accion.btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #212529;
+}
+
+.btn-accion.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+/* Estilos para el modal de edición */
+.modal-editar-cliente .modal-content {
+    border-radius: 8px;
+    border: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.modal-editar-cliente .modal-header {
+    background: linear-gradient(135deg, #00a7b5, #008a96);
+    border-radius: 8px 8px 0 0;
+    border-bottom: none;
+}
+
+.modal-editar-cliente .modal-title {
+    color: white;
+    font-weight: 600;
+}
+
+.modal-editar-cliente .close {
+    color: white;
+    opacity: 0.8;
+    text-shadow: none;
+}
+
+.modal-editar-cliente .close:hover {
+    opacity: 1;
+}
+
+/* Estilos para mensajes de validación */
+.mensaje-validacion {
+    font-size: 12px;
+    color: #dc3545;
+    margin-top: 5px;
+}
+
+.mensaje-exito {
+    font-size: 12px;
+    color: #28a745;
+    margin-top: 5px;
+}
+
+/* Estilos para campos requeridos */
+.campo-requerido::after {
+    content: " *";
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* Estilos para el título de la página */
+.titulo-pagina {
+    color: #333;
+    font-weight: 700;
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #00a7b5;
+}
+
+/* Estilos para el panel de la tabla */
+.panel-tabla {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border: none;
+}
+
+.panel-tabla .ms-panel-header {
+    background: linear-gradient(135deg, #00a7b5, #008a96);
+    color: white;
+    border-radius: 8px 8px 0 0;
+    padding: 15px 20px;
+}
+
+.panel-tabla .ms-panel-header h6 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+/* Estilos para el panel del formulario */
+.panel-formulario {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border: none;
+}
+
+.panel-formulario .ms-panel-header {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    border-radius: 8px 8px 0 0;
+    padding: 15px 20px;
+}
+
+.panel-formulario .ms-panel-header h6 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+    .form-cliente .col-md-4,
+    .form-cliente .col-md-6 {
+        margin-bottom: 15px;
+    }
+    
+    .table-clientes {
+        font-size: 14px;
+    }
+    
+    .btn-accion {
+        width: 35px;
+        height: 30px;
+        margin: 1px;
+    }
+    
+    .btn-accion i {
+        font-size: 12px;
+    }
+    
+    /* Estilos responsivos para el loader */
+    .loader-container {
+        min-width: 280px;
+        max-width: 90vw;
+        padding: 30px 20px;
+        margin: 0 10px;
+    }
+    
+    .loader-text {
+        font-size: 16px;
+    }
+    
+    .loader-subtext {
+        font-size: 13px;
+    }
+    
+    .loader-spinner {
+        width: 40px;
+        height: 40px;
+        margin: 0 auto 15px;
+    }
+}
+
+/* Estilos para el footer */
+.footer-field {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    margin-top: 30px;
+}
+
+.footer-field h3 {
+    color: #6c757d;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+/* Animaciones suaves */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Estilos para el estado de carga */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #00a7b5;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Estilos mejorados para el loader */
+.loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    backdrop-filter: blur(2px);
+    margin: 0;
+    padding: 0;
+}
+
+.loader-container {
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    min-width: 300px;
+    max-width: 450px;
+    animation: fadeInScale 0.3s ease-out;
+    position: relative;
+    margin: 0 auto;
+}
+
+.loader-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #00a7b5;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+.loader-text {
+    color: #333;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 10px 0;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.loader-subtext {
+    color: #666;
+    font-size: 14px;
+    margin: 0;
+    font-weight: 400;
+    word-wrap: break-word;
+}
+
+/* Estilos para botones deshabilitados durante carga */
+.btn-loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.btn-loading::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid transparent;
+    border-top: 2px solid #ffffff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Animación para el contenedor del loader */
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Estilos adicionales para centrado perfecto del loader */
+.loader-overlay {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-direction: column !important;
+}
+
+.loader-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+}
+
+/* Estilos para cabecera sticky de la tabla de planes de acción */
+.table-responsive {
+    position: relative !important;
+    overflow-x: auto !important;
+    overflow-y: visible !important; /* Cambiar de auto a visible para permitir sticky */
+}
+
+#tabla_planes_accion {
+    position: relative !important;
+    width: 100% !important;
+    margin-bottom: 0 !important;
+}
+
+#tabla_planes_accion thead {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
+    background-color: #00a7b5 !important;
+}
+
+#tabla_planes_accion thead th {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1001 !important;
+    background-color: #00a7b5 !important;
+    color: white !important;
+    font-weight: 600 !important;
+    border: none !important;
+    padding: 15px 10px !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    white-space: nowrap !important;
+}
+
+/* Asegurar que la cabecera mantenga su estilo cuando es sticky */
+#tabla_planes_accion thead th:hover {
+    background-color: #00a7b5 !important;
+}
+
+/* Estilos adicionales para mejorar la apariencia */
+#tabla_planes_accion tbody tr:hover {
+    background-color: #f8f9fa !important;
+}
+
+#tabla_planes_accion tbody td {
+    padding: 12px 10px !important;
+    vertical-align: middle !important;
+    border-top: 1px solid #dee2e6 !important;
+}
+
+/* Asegurar que el contenedor de la tabla permita el sticky */
+.ms-panel-body {
+    overflow: visible !important;
+}
+
+/* Forzar el sticky positioning con especificidad máxima */
+body .ms-panel-body .table-responsive #tabla_planes_accion thead th {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1001 !important;
+    background-color: #00a7b5 !important;
+    color: white !important;
+}
+
+/* Responsive para pantallas pequeñas */
+@media (max-width: 768px) {
+    #tabla_planes_accion thead th {
+        padding: 10px 5px !important;
+        font-size: 0.9rem !important;
+    }
+    
+    #tabla_planes_accion tbody td {
+        padding: 8px 5px !important;
+        font-size: 0.85rem !important;
+    }
+}
+
+/* Forzar el sticky positioning */
+.table-responsive::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}

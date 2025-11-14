@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Cabecera Sticky con JavaScript</title>
+    <link href="css/administradorClientes.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .ms-body {
+            background-color: #f5f5f5;
+        }
+        
+        .ms-content-wrapper {
+            padding: 20px;
+        }
+        
+        .ms-panel {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .ms-panel-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            padding: 15px 20px;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .ms-panel-body {
+            padding: 20px;
+        }
+        
+        .test-info {
+            background-color: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .scroll-instruction {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .print-title {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .alert-info {
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
+        
+        /* Estilos específicos para sticky con JavaScript */
+        .table-sticky-header {
+            position: relative;
+        }
+        
+        .sticky-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background-color: #00a7b5;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: none;
+        }
+        
+        .sticky-header th {
+            padding: 15px 10px;
+            border: none;
+            white-space: nowrap;
+        }
+        
+        .sticky-header.active {
+            display: table;
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="ms-body">
+    <!-- Main Content -->
+    <main class="body-content">
+        <!-- Body Content Wrapper -->
+        <div class="ms-content-wrapper">
+            <div class="row print-title">
+                <div class="col-md-8">
+                    <span style="font-size: 40px;">Planes de Acción de Clientes</span>
+                </div>
+                <div class="col-md-4 text-right">
+                    <button class="btn btn-info btn-lg mr-2">
+                        <i class="fa fa-folder-open"></i> Visor de Historial
+                    </button>
+                    <button class="btn btn-secondary btn-lg">
+                        <i class="fa fa-arrow-left"></i> Volver a Clientes
+                    </button>
+                </div>
+            </div>
+
+            <!-- Información del cliente seleccionado -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="ms-panel">
+                        <div class="ms-panel-header">
+                            <h6>Cliente Seleccionado</h6>
+                        </div>
+                        <div class="ms-panel-body">
+                            <div class="alert alert-info">
+                                <i class="fa fa-info-circle"></i>
+                                <strong>Cliente:</strong> <span>WALMART - Test de Cabecera Sticky con JavaScript</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="test-info">
+                <h5><i class="fa fa-info-circle"></i> Test de Cabecera Sticky con JavaScript</h5>
+                <p>Esta versión usa JavaScript para crear una cabecera sticky que se muestra cuando la tabla original sale de la vista.</p>
+            </div>
+
+            <div class="scroll-instruction">
+                <i class="fa fa-arrow-down"></i> <strong>Haz scroll hacia abajo para probar la cabecera sticky</strong> <i class="fa fa-arrow-down"></i>
+            </div>
+
+            <!-- Contenido de prueba para hacer scroll -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="ms-panel">
+                        <div class="ms-panel-header">
+                            <h6>Contenido de Prueba</h6>
+                        </div>
+                        <div class="ms-panel-body">
+                            <p>Este contenido está aquí para que puedas hacer scroll y probar que la cabecera de la tabla permanezca fija.</p>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Card 1</h5>
+                                            <p class="card-text">Contenido de ejemplo para hacer scroll.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Card 2</h5>
+                                            <p class="card-text">Más contenido para hacer scroll.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Card 3</h5>
+                                            <p class="card-text">Aún más contenido para hacer scroll.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de planes de acción con cabecera sticky -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="ms-panel">
+                        <div class="ms-panel-header">
+                            <h6>Planes de Acción</h6>
+                        </div>
+                        <div class="ms-panel-body">
+                            <div class="table-responsive table-sticky-header">
+                                <table id="tabla_planes_accion" class="table w-100 thead-primary">
+                                    <thead id="original-header">
+                                        <tr>
+                                            <th>ID Registro</th>
+                                            <th>Área de Oportunidad</th>
+                                            <th>Plan de Acción</th>
+                                            <th>Tópicos</th>
+                                            <th>Entregables</th>
+                                            <th>Periodicidades</th>
+                                            <th>Acciones</th>
+                                            <th>Cargar Archivo</th>
+                                            <th>Historial de Archivos</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tabla_planes_accion_body">
+                                        <!-- Datos de prueba -->
+                                        <tr>
+                                            <td>1</td>
+                                            <td>Seguridad Industrial</td>
+                                            <td>Implementar protocolos de seguridad</td>
+                                            <td>Capacitación</td>
+                                            <td>Manual de procedimientos</td>
+                                            <td>Mensual</td>
+                                            <td><button class="btn btn-sm btn-primary">Ver</button></td>
+                                            <td><button class="btn btn-sm btn-success">Cargar</button></td>
+                                            <td><button class="btn btn-sm btn-info">Historial</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2</td>
+                                            <td>Calidad</td>
+                                            <td>Mejorar procesos de control</td>
+                                            <td>Auditorías</td>
+                                            <td>Reportes de calidad</td>
+                                            <td>Semanal</td>
+                                            <td><button class="btn btn-sm btn-primary">Ver</button></td>
+                                            <td><button class="btn btn-sm btn-success">Cargar</button></td>
+                                            <td><button class="btn btn-sm btn-info">Historial</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>3</td>
+                                            <td>Productividad</td>
+                                            <td>Optimizar tiempos de producción</td>
+                                            <td>Análisis de procesos</td>
+                                            <td>Estudios de tiempo</td>
+                                            <td>Quincenal</td>
+                                            <td><button class="btn btn-sm btn-primary">Ver</button></td>
+                                            <td><button class="btn btn-sm btn-success">Cargar</button></td>
+                                            <td><button class="btn btn-sm btn-info">Historial</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>4</td>
+                                            <td>Mantenimiento</td>
+                                            <td>Programa de mantenimiento preventivo</td>
+                                            <td>Equipos críticos</td>
+                                            <td>Cronograma de mantenimiento</td>
+                                            <td>Mensual</td>
+                                            <td><button class="btn btn-sm btn-primary">Ver</button></td>
+                                            <td><button class="btn btn-sm btn-success">Cargar</button></td>
+                                            <td><button class="btn btn-sm btn-info">Historial</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>5</td>
+                                            <td>Recursos Humanos</td>
+                                            <td>Capacitación del personal</td>
+                                            <td>Desarrollo profesional</td>
+                                            <td>Plan de capacitación</td>
+                                            <td>Trimestral</td>
+                                            <td><button class="btn btn-sm btn-primary">Ver</button></td>
+                                            <td><button class="btn btn-sm btn-success">Cargar</button></td>
+                                            <td><button class="btn btn-sm btn-info">Historial</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>6</td>
+                                            <td>Medio Ambiente</td>
+                                            <td>Reducir impacto ambiental</td>
+                                            <td>Sostenibilidad</td>
+                                            <td>Reportes ambientales</td>
+                                            <td>Mensual</td>
+                                            <td><button class="btn btn-sm btn-primary">Ver</button></td>
+                                            <td><button class="btn btn-sm btn-success">Cargar</button></td>
+                                            <td><button class="btn btn-sm btn-info">Historial</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>7</td>
+                                            <td>Innovación</td>
+                                            <td>Implementar nuevas tecnologías</td>
+                                            <td>Digitalización</td>
+                                            <td>Propuesta de innovación</td>
+                                            <td>Semestral</td>
+                                            <td><button class="btn btn-sm btn-primary">Ver</button></td>
+                                            <td><button class="btn btn-sm btn-success">Cargar</button></td>
+                                            <td><button class="btn btn-sm btn-info">Historial</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>8</td>
+                                            <td>Comunicación</td>
+                                            <td>Mejorar comunicación interna</td>
+                                            <td>Transparencia</td>
+                                            <td>Protocolo de comunicación</td>
+                                            <td>Mensual</td>
+                                            <td><button class="btn btn-sm btn-primary">Ver</button></td>
+                                            <td><button class="btn btn-sm btn-success">Cargar</button></td>
+                                            <td><button class="btn btn-sm btn-info">Historial</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>9</td>
+                                            <td>Finanzas</td>
+                                            <td>Optimizar costos operativos</td>
+                                            <td>Análisis financiero</td>
+                                            <td>Reportes de costos</td>
+                                            <td>Mensual</td>
+                                            <td><button class="btn btn-sm btn-primary">Ver</button></td>
+                                            <td><button class="btn btn-sm btn-success">Cargar</button></td>
+                                            <td><button class="btn btn-sm btn-info">Historial</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>10</td>
+                                            <td>Logística</td>
+                                            <td>Mejorar cadena de suministro</td>
+                                            <td>Eficiencia</td>
+                                            <td>Plan logístico</td>
+                                            <td>Mensual</td>
+                                            <td><button class="btn btn-sm btn-primary">Ver</button></td>
+                                            <td><button class="btn btn-sm btn-success">Cargar</button></td>
+                                            <td><button class="btn btn-sm btn-info">Historial</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>11</td>
+                                            <td>Ventas</td>
+                                            <td>Aumentar ventas</td>
+                                            <td>Estrategia comercial</td>
+                                            <td>Plan de ventas</td>
+                                            <td>Mensual</td>
+                                            <td><button class="btn btn-sm btn-primary">Ver</button></td>
+                                            <td><button class="btn btn-sm btn-success">Cargar</button></td>
+                                            <td><button class="btn btn-sm btn-info">Historial</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>12</td>
+                                            <td>Marketing</td>
+                                            <td>Estrategia de marketing digital</td>
+                                            <td>Presencia online</td>
+                                            <td>Plan de marketing</td>
+                                            <td>Trimestral</td>
+                                            <td><button class="btn btn-sm btn-primary">Ver</button></td>
+                                            <td><button class="btn btn-sm btn-success">Cargar</button></td>
+                                            <td><button class="btn btn-sm btn-info">Historial</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>13</td>
+                                            <td>Investigación</td>
+                                            <td>Desarrollo de nuevos productos</td>
+                                            <td>I+D</td>
+                                            <td>Propuesta de producto</td>
+                                            <td>Semestral</td>
+                                            <td><button class="btn btn-sm btn-primary">Ver</button></td>
+                                            <td><button class="btn btn-sm btn-success">Cargar</button></td>
+                                            <td><button class="btn btn-sm btn-info">Historial</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>14</td>
+                                            <td>Legal</td>
+                                            <td>Cumplimiento normativo</td>
+                                            <td>Regulaciones</td>
+                                            <td>Manual de cumplimiento</td>
+                                            <td>Mensual</td>
+                                            <td><button class="btn btn-sm btn-primary">Ver</button></td>
+                                            <td><button class="btn btn-sm btn-success">Cargar</button></td>
+                                            <td><button class="btn btn-sm btn-info">Historial</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>15</td>
+                                            <td>Administración</td>
+                                            <td>Optimizar procesos administrativos</td>
+                                            <td>Eficiencia</td>
+                                            <td>Manual de procedimientos</td>
+                                            <td>Mensual</td>
+                                            <td><button class="btn btn-sm btn-primary">Ver</button></td>
+                                            <td><button class="btn btn-sm btn-success">Cargar</button></td>
+                                            <td><button class="btn btn-sm btn-info">Historial</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>16</td>
+                                            <td>Seguridad</td>
+                                            <td>Implementar medidas de seguridad</td>
+                                            <td>Protección</td>
+                                            <td>Plan de seguridad</td>
+                                            <td>Mensual</td>
+                                            <td><button class="btn btn-sm btn-primary">Ver</button></td>
+                                            <td><button class="btn btn-sm btn-success">Cargar</button></td>
+                                            <td><button class="btn btn-sm btn-info">Historial</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>17</td>
+                                            <td>Comunicación</td>
+                                            <td>Mejorar comunicación externa</td>
+                                            <td>Relaciones públicas</td>
+                                            <td>Estrategia de comunicación</td>
+                                            <td>Mensual</td>
+                                            <td><button class="btn btn-sm btn-primary">Ver</button></td>
+                                            <td><button class="btn btn-sm btn-success">Cargar</button></td>
+                                            <td><button class="btn btn-sm btn-info">Historial</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>18</td>
+                                            <td>Desarrollo</td>
+                                            <td>Desarrollo de competencias</td>
+                                            <td>Capacitación</td>
+                                            <td>Plan de desarrollo</td>
+                                            <td>Trimestral</td>
+                                            <td><button class="btn btn-sm btn-primary">Ver</button></td>
+                                            <td><button class="btn btn-sm btn-success">Cargar</button></td>
+                                            <td><button class="btn btn-sm btn-info">Historial</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>19</td>
+                                            <td>Innovación</td>
+                                            <td>Fomentar la innovación</td>
+                                            <td>Creatividad</td>
+                                            <td>Programa de innovación</td>
+                                            <td>Semestral</td>
+                                            <td><button class="btn btn-sm btn-primary">Ver</button></td>
+                                            <td><button class="btn btn-sm btn-success">Cargar</button></td>
+                                            <td><button class="btn btn-sm btn-info">Historial</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>20</td>
+                                            <td>Eficiencia</td>
+                                            <td>Mejorar eficiencia operativa</td>
+                                            <td>Optimización</td>
+                                            <td>Plan de eficiencia</td>
+                                            <td>Mensual</td>
+                                            <td><button class="btn btn-sm btn-primary">Ver</button></td>
+                                            <td><button class="btn btn-sm btn-success">Cargar</button></td>
+                                            <td><button class="btn btn-sm btn-info">Historial</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Más contenido después de la tabla para hacer scroll -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="ms-panel">
+                        <div class="ms-panel-header">
+                            <h6>Más Contenido de Prueba</h6>
+                        </div>
+                        <div class="ms-panel-body">
+                            <p>Este contenido está después de la tabla para que puedas seguir haciendo scroll y verificar que la cabecera permanezca fija.</p>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Card Adicional 1</h5>
+                                            <p class="card-text">Contenido adicional para hacer scroll y probar la cabecera sticky.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Card Adicional 2</h5>
+                                            <p class="card-text">Más contenido para hacer scroll y probar la cabecera sticky.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-success">
+                <h5><i class="fa fa-check-circle"></i> Test Completado</h5>
+                <p>Si la cabecera de la tabla permaneció visible mientras hacías scroll, el test fue exitoso.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Cabecera sticky que se muestra con JavaScript -->
+    <div class="sticky-header" id="sticky-header">
+        <table class="table w-100">
+            <thead>
+                <tr>
+                    <th>ID Registro</th>
+                    <th>Área de Oportunidad</th>
+                    <th>Plan de Acción</th>
+                    <th>Tópicos</th>
+                    <th>Entregables</th>
+                    <th>Periodicidades</th>
+                    <th>Acciones</th>
+                    <th>Cargar Archivo</th>
+                    <th>Historial de Archivos</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            const originalHeader = $('#original-header');
+            const stickyHeader = $('#sticky-header');
+            const table = $('#tabla_planes_accion');
+            
+            // Función para manejar el scroll
+            function handleScroll() {
+                const tableOffset = table.offset().top;
+                const scrollTop = $(window).scrollTop();
+                const windowHeight = $(window).height();
+                
+                // Si la tabla está visible en la pantalla
+                if (scrollTop >= tableOffset - 100 && scrollTop < tableOffset + table.outerHeight() - windowHeight) {
+                    stickyHeader.addClass('active');
+                } else {
+                    stickyHeader.removeClass('active');
+                }
+            }
+            
+            // Escuchar el evento de scroll
+            $(window).on('scroll', handleScroll);
+            
+            // Ejecutar al cargar la página
+            handleScroll();
+            
+            // Debug: mostrar información en consola
+            console.log('Sticky header script loaded');
+            console.log('Table offset:', table.offset());
+            console.log('Window height:', $(window).height());
+        });
+    </script>
+</body>
+</html>

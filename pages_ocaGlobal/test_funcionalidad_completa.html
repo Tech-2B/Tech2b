@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Funcionalidad Completa - Redirección por Rol</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        .test-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .test-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+        
+        .test-card h5 {
+            color: #00a7b5;
+            margin-bottom: 15px;
+        }
+        
+        .test-info {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .test-info h6 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        
+        .btn-test {
+            background-color: #00a7b5;
+            border-color: #00a7b5;
+            color: white;
+            margin: 5px;
+        }
+        
+        .btn-test:hover {
+            background-color: #008a96;
+            border-color: #008a96;
+        }
+        
+        .simulation-area {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .role-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 5px;
+        }
+        
+        .role-admin {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .role-cliente {
+            background-color: #17a2b8;
+            color: white;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .feature-list i {
+            margin-right: 10px;
+            width: 20px;
+        }
+        
+        .feature-success {
+            color: #28a745;
+        }
+        
+        .feature-warning {
+            color: #ffc107;
+        }
+        
+        .feature-info {
+            color: #17a2b8;
+        }
+        
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-info">
+            <h6><i class="fa fa-info-circle"></i> Test de Funcionalidad Completa - Redirección por Rol</h6>
+            <p>Esta página documenta todas las funcionalidades implementadas para la redirección automática según el rol del usuario.</p>
+        </div>
+        
+        <div class="test-card">
+            <h5><i class="fa fa-cogs"></i> Funcionalidades Implementadas</h5>
+            <ul class="feature-list">
+                <li><i class="fa fa-check-circle feature-success"></i> Redirección automática para clientes al visor de historial</li>
+                <li><i class="fa fa-check-circle feature-success"></i> Ocultación de secciones del sidebar según el rol</li>
+                <li><i class="fa fa-check-circle feature-success"></i> Carga automática del único cliente para usuarios con rol "Cliente"</li>
+                <li><i class="fa fa-check-circle feature-success"></i> Mantenimiento de funcionalidad completa para administradores</li>
+                <li><i class="fa fa-check-circle feature-success"></i> Botón "Volver" solo visible para administradores</li>
+                <li><i class="fa fa-check-circle feature-success"></i> Cabecera sticky en la tabla del visor de historial</li>
+            </ul>
+        </div>
+        
+        <div class="test-card">
+            <h5><i class="fa fa-code"></i> Código PHP - Redirección Automática</h5>
+            <div class="code-block">
+// En menu.php - Redirección automática para clientes
+if ($rol === "Cliente") {
+    $current_page = basename($_SERVER['PHP_SELF']);
+    if ($current_page !== 'visorHistorialArchivos.php') {
+        header("Location: visorHistorialArchivos.php");
+        exit();
+    }
+}
+            </div>
+        </div>
+        
+        <div class="test-card">
+            <h5><i class="fa fa-code"></i> Código PHP - Menú Condicional</h5>
+            <div class="code-block">
+// En menu.php - Menú según el rol
+<?php if ($rol === "Administrador"): ?>
+    <!-- Todas las opciones del menú -->
+<?php elseif ($rol === "Cliente"): ?>
+    <!-- Solo Visor de Historial y Cerrar sesión -->
+<?php endif; ?>
+            </div>
+        </div>
+        
+        <div class="test-card">
+            <h5><i class="fa fa-code"></i> Código PHP - Carga Automática de Cliente</h5>
+            <div class="code-block">
+// En visorHistorialArchivos.php - Carga automática del cliente
+$cliente_automatico = null;
+if ($rol === "Cliente") {
+    $query_cliente = "SELECT id_cliente, nombre_cliente, codigo_cliente, tipo_cliente 
+                      FROM clientes WHERE activo = 1 LIMIT 1";
+    $result_cliente = mysqli_query($conn, $query_cliente);
+    
+    if ($result_cliente && mysqli_num_rows($result_cliente) > 0) {
+        $cliente_automatico = mysqli_fetch_assoc($result_cliente);
+    }
+}
+            </div>
+        </div>
+        
+        <div class="test-card">
+            <h5><i class="fa fa-code"></i> Código JavaScript - Lógica de Cliente</h5>
+            <div class="code-block">
+// En visorHistorialArchivos.js - Verificación de cliente
+verificarClienteSeleccionado() {
+    // Si el rol es "Cliente", usar el cliente automático
+    if (window.rolUsuario === 'Cliente' && window.clienteAutomatico) {
+        this.clienteActual = {
+            id: window.clienteAutomatico.id_cliente,
+            nombre: window.clienteAutomatico.nombre_cliente,
+            codigo: window.clienteAutomatico.codigo_cliente,
+            tipo: window.clienteAutomatico.tipo_cliente
+        };
+        
+        this.mostrarInformacionCliente();
+        this.cargarPlanesAccion();
+        return;
+    }
+    
+    // Para administradores, usar sessionStorage
+    // ... resto del código
+}
+            </div>
+        </div>
+        
+        <div class="test-card">
+            <h5><i class="fa fa-play"></i> Casos de Prueba</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <h6><i class="fa fa-user-shield"></i> Administrador</h6>
+                    <ul class="feature-list">
+                        <li><i class="fa fa-check feature-success"></i> Acceso a todas las secciones del menú</li>
+                        <li><i class="fa fa-check feature-success"></i> Selección manual de cliente desde sessionStorage</li>
+                        <li><i class="fa fa-check feature-success"></i> Navegación libre entre páginas</li>
+                        <li><i class="fa fa-check feature-success"></i> Botón "Volver" visible en el visor</li>
+                        <li><i class="fa fa-check feature-success"></i> Funcionalidad completa de administración</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6><i class="fa fa-user"></i> Cliente</h6>
+                    <ul class="feature-list">
+                        <li><i class="fa fa-check feature-success"></i> Redirección automática al visor de historial</li>
+                        <li><i class="fa fa-check feature-success"></i> Solo opción "Visor de Historial" visible en el menú</li>
+                        <li><i class="fa fa-check feature-success"></i> Carga automática del único cliente de la BD</li>
+                        <li><i class="fa fa-check feature-success"></i> Sin botón "Volver" en el visor</li>
+                        <li><i class="fa fa-check feature-success"></i> Acceso solo de lectura a su historial</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-card">
+            <h5><i class="fa fa-database"></i> Flujo de Datos</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Administrador:</h6>
+                    <ol>
+                        <li>Inicia sesión</li>
+                        <li>Ve todas las opciones del menú</li>
+                        <li>Selecciona un cliente manualmente</li>
+                        <li>Los datos se guardan en sessionStorage</li>
+                        <li>Navega al visor de historial</li>
+                        <li>Los datos se cargan desde sessionStorage</li>
+                    </ol>
+                </div>
+                <div class="col-md-6">
+                    <h6>Cliente:</h6>
+                    <ol>
+                        <li>Inicia sesión</li>
+                        <li>Es redirigido automáticamente al visor</li>
+                        <li>Solo ve "Visor de Historial" en el menú</li>
+                        <li>Se consulta automáticamente el único cliente de la BD</li>
+                        <li>Los datos se cargan automáticamente</li>
+                        <li>Ve su historial de archivos</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-card">
+            <h5><i class="fa fa-bug"></i> Validaciones y Manejo de Errores</h5>
+            <ul class="feature-list">
+                <li><i class="fa fa-shield-alt feature-info"></i> Validación de sesión activa</li>
+                <li><i class="fa fa-shield-alt feature-info"></i> Verificación de rol válido</li>
+                <li><i class="fa fa-shield-alt feature-info"></i> Manejo de errores de base de datos</li>
+                <li><i class="fa fa-shield-alt feature-info"></i> Validación de existencia de cliente</li>
+                <li><i class="fa fa-shield-alt feature-info"></i> Redirección segura sin bucles infinitos</li>
+            </ul>
+        </div>
+        
+        <div class="test-card">
+            <h5><i class="fa fa-rocket"></i> Archivos de Prueba</h5>
+            <div class="row">
+                <div class="col-md-4">
+                    <h6>Test de Redirección:</h6>
+                    <p><code>test_redireccion_cliente.html</code></p>
+                    <a href="test_redireccion_cliente.html" class="btn btn-test btn-sm">
+                        <i class="fa fa-external-link-alt"></i> Abrir
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <h6>Test de Cabecera Sticky:</h6>
+                    <p><code>test_visor_sticky.html</code></p>
+                    <a href="test_visor_sticky.html" class="btn btn-test btn-sm">
+                        <i class="fa fa-external-link-alt"></i> Abrir
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <h6>Test de Funcionalidad:</h6>
+                    <p><code>test_funcionalidad_completa.html</code></p>
+                    <a href="test_funcionalidad_completa.html" class="btn btn-test btn-sm">
+                        <i class="fa fa-external-link-alt"></i> Abrir
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,310 @@
+/* ===== ESTILOS PARA VALIDADOR DE ARCHIVOS ===== */
+
+/* Contador de archivos pendientes */
+#contador_pendientes {
+  font-size: 16px;
+  padding: 10px 15px;
+  border-radius: 20px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Estilos para la tabla de archivos pendientes */
+#tabla_archivos_pendientes {
+  margin-top: 20px;
+}
+
+#tabla_archivos_pendientes thead th {
+  background-color: #0080ff;
+  color: white;
+  border: none;
+  font-weight: 600;
+  padding: 15px 10px;
+  text-align: left;
+  font-size: 14px;
+}
+
+#tabla_archivos_pendientes tbody td {
+  padding: 15px 10px;
+  vertical-align: middle;
+  border-bottom: 1px solid #e9ecef;
+  font-size: 14px;
+}
+
+#tabla_archivos_pendientes tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* Estilos para estados de archivos */
+.estado-pendiente {
+  background-color: #ffc107;
+  color: #212529;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.estado-aprobado {
+  background-color: #28a745;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.estado-rechazado {
+  background-color: #dc3545;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Estilos para información de archivos */
+.info-archivo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.info-archivo .icono-archivo {
+  font-size: 24px;
+  color: #6c757d;
+}
+
+.info-archivo .detalles-archivo {
+  flex: 1;
+}
+
+.info-archivo .nombre-archivo {
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 5px;
+}
+
+.info-archivo .comentario-archivo {
+  font-size: 12px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Estilos para botones de acción */
+.btn-validar {
+  margin: 2px;
+  min-width: 35px;
+  width: 35px;
+  height: 32px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-validar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.btn-validar i {
+  font-size: 14px;
+}
+
+/* Estilos para el modal de validación */
+#modal_validar_archivo .modal-body {
+  padding: 20px;
+}
+
+#info_archivo_validar {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+#info_archivo_validar .archivo-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+#info_archivo_validar .archivo-info .icono {
+  font-size: 48px;
+  color: #6c757d;
+}
+
+#info_archivo_validar .archivo-info .detalles {
+  flex: 1;
+}
+
+#info_archivo_validar .archivo-info .detalles h6 {
+  margin: 0 0 5px 0;
+  color: #212529;
+  font-weight: 600;
+}
+
+#info_archivo_validar .archivo-info .detalles .meta {
+  font-size: 12px;
+  color: #6c757d;
+  margin-bottom: 3px;
+}
+
+#info_archivo_validar .archivo-info .detalles .comentario {
+  font-size: 14px;
+  color: #495057;
+  font-style: italic;
+  margin-top: 10px;
+  padding: 10px;
+  background-color: white;
+  border-radius: 5px;
+  border-left: 3px solid #007bff;
+}
+
+/* Estilos para filtros */
+.ms-panel .form-control {
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+.ms-panel .form-control:focus {
+  border-color: #0080ff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 128, 255, 0.25);
+}
+
+.ms-panel label {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 5px;
+}
+
+/* Estilos para badges de estado */
+.badge-estado {
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-estado.pendiente {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.badge-estado.aprobado {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.badge-estado.rechazado {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* Estilos para iconos de tipo de archivo */
+.icono-tipo-archivo {
+  font-size: 20px;
+  margin-right: 8px;
+}
+
+.icono-tipo-archivo.pdf { color: #dc3545; }
+.icono-tipo-archivo.doc, .icono-tipo-archivo.docx { color: #007bff; }
+.icono-tipo-archivo.xls, .icono-tipo-archivo.xlsx { color: #28a745; }
+.icono-tipo-archivo.ppt, .icono-tipo-archivo.pptx { color: #fd7e14; }
+.icono-tipo-archivo.jpg, .icono-tipo-archivo.jpeg, .icono-tipo-archivo.png { color: #6f42c1; }
+.icono-tipo-archivo.txt { color: #6c757d; }
+.icono-tipo-archivo.zip, .icono-tipo-archivo.rar { color: #20c997; }
+
+/* Estilos responsive */
+@media (max-width: 768px) {
+  .info-archivo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+  
+  .info-archivo .icono-archivo {
+    font-size: 20px;
+  }
+  
+  #contador_pendientes {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+  
+  .btn-validar {
+    min-width: 30px;
+    width: 30px;
+    height: 28px;
+    font-size: 12px;
+  }
+}
+
+/* Animaciones */
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+/* Estilos para mensajes de estado */
+.mensaje-estado {
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin: 10px 0;
+  font-weight: 500;
+}
+
+.mensaje-estado.info {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+.mensaje-estado.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.mensaje-estado.warning {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.mensaje-estado.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}

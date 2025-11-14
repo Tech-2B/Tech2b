@@ -1,0 +1,78 @@
+/* Evita que DataTables limite la altura y permite expansión natural */
+.dataTables_wrapper {
+  overflow: visible !important;
+  max-height: none !important;
+}
+
+/* Contenedor de la tabla con scroll horizontal únicamente */
+.table-responsive {
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  max-height: none !important;
+  width: 100%;
+}
+
+/* Asegura que el encabezado se quede fijo al hacer scroll vertical */
+table.dataTable thead th {
+  background: linear-gradient(135deg, #00a7b5 0%, #008a96 100%) !important;
+  color: white !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 100 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  font-weight: 600 !important;
+  padding: 12px 8px !important;
+  white-space: nowrap !important;
+}
+
+/* Asegura que toda la cabecera sea sticky */
+table.dataTable thead {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 100 !important;
+  background: linear-gradient(135deg, #00a7b5 0%, #008a96 100%) !important;
+}
+
+/* Corrige el alineamiento con scroll horizontal */
+.dataTables_scrollHeadInner {
+  width: 100% !important;
+}
+
+/* Asegura que las celdas del cuerpo no interfieran con la cabecera fija */
+table.dataTable tbody td {
+  background: white;
+  border-bottom: 1px solid #dee2e6;
+  padding: 8px;
+  vertical-align: top;
+}
+
+/* Hover effect para las filas */
+table.dataTable tbody tr:hover {
+  background-color: #f8f9fa !important;
+}
+
+/* Asegura que el contenedor principal permita la expansión natural */
+.ms-panel-body {
+  overflow: visible !important;
+  max-height: none !important;
+}
+
+/* Estilos específicos para la tabla de planes de acción */
+#tabla_planes_accion {
+  table-layout: auto;
+  width: auto;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* Asegura que el paginador sea visible */
+.dataTables_paginate {
+  margin-top: 20px !important;
+  overflow: visible !important;
+}
+
+.dataTables_info {
+  margin-top: 10px !important;
+  overflow: visible !important;
+}
