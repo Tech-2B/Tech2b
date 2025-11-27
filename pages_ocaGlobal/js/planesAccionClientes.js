@@ -2969,21 +2969,34 @@ class PlanesAccionClientes {
     
     Swal.fire({
       title: 'Crear Nueva Carpeta',
-      html: `
-        <input type="text" id="nombre_carpeta_nueva" class="swal2-input" placeholder="Nombre de la carpeta">
-        <p class="text-muted">La carpeta se creará dentro de la carpeta seleccionada</p>
-      `,
+      input: 'text',
+      inputPlaceholder: 'Nombre de la carpeta',
+      inputAttributes: {
+        'aria-label': 'Nombre de la carpeta'
+      },
+      html: '<p class="text-muted" style="margin-top: 10px;">La carpeta se creará dentro de la carpeta seleccionada</p>',
       showCancelButton: true,
       confirmButtonText: 'Crear',
       cancelButtonText: 'Cancelar',
       inputValidator: (value) => {
-        if (!value) {
+        if (!value || !value.trim()) {
           return 'Debe ingresar un nombre para la carpeta';
         }
       },
-      preConfirm: async () => {
-        const nombre = document.getElementById('nombre_carpeta_nueva').value.trim();
-        return await this.crearCarpetaEnUbicacion(nombre, idCarpetaPadre);
+      didOpen: () => {
+        // Asegurar que el input esté habilitado y enfocado
+        const input = Swal.getInput();
+        if (input) {
+          input.focus();
+          input.select();
+        }
+      },
+      preConfirm: async (nombre) => {
+        if (!nombre || !nombre.trim()) {
+          Swal.showValidationMessage('Debe ingresar un nombre para la carpeta');
+          return false;
+        }
+        return await this.crearCarpetaEnUbicacion(nombre.trim(), idCarpetaPadre);
       }
     });
   }
