@@ -12,6 +12,9 @@ class PlanesAccionClientes {
     this.archivosRaizHistorial = [];
     this.clienteActualHistorial = null;
     this.planAccionActualHistorial = null;
+    // Variables para navegador de carpetas
+    this.carpetaSeleccionada = null;
+    this.carpetaPadreParaCrear = null;
     this.init();
   }
 
@@ -453,13 +456,41 @@ class PlanesAccionClientes {
     }
     
     try {
+      // Limpiar estado anterior completamente
+      this.limpiarEstadoModalCarga();
+
       // Llenar campos ocultos
       document.getElementById('id_registro_archivo').value = idRegistro;
       document.getElementById('id_cliente_archivo').value = idCliente;
       document.getElementById('id_plan_accion_archivo').value = idPlanAccion;
 
-      // Cargar carpetas disponibles
-      await this.cargarCarpetasDisponibles(idCliente, idPlanAccion);
+      // Limpiar selección anterior
+      this.carpetaSeleccionada = null;
+      this.carpetaPadreParaCrear = null;
+
+      // Limpiar campo de carpeta destino
+      const inputCarpeta = document.getElementById('carpeta_destino_navegador');
+      if (inputCarpeta) {
+        inputCarpeta.value = '';
+      }
+
+      // Mostrar indicador de carga
+      const navegador = document.getElementById('navegador_carpetas');
+      if (navegador) {
+        navegador.innerHTML = '<div class="text-center text-muted p-3"><i class="fa fa-spinner fa-spin"></i> Cargando estructura de carpetas...</div>';
+      }
+
+      // Cargar estructura completa de carpetas en el navegador
+      const estructura = await this.cargarEstructuraCompletaCarpetas(idCliente, idPlanAccion);
+      if (estructura) {
+        this.renderizarArbolCarpetas(estructura);
+      } else {
+        document.getElementById('navegador_carpetas').innerHTML = 
+          '<div class="text-muted text-center p-3"><i class="fa fa-folder-open"></i> No hay carpetas disponibles. Crea una nueva carpeta.</div>';
+      }
+
+      // Configurar evento de limpieza al cerrar el modal
+      this.configurarEventosModalCarga();
 
       // Mostrar modal
       $('#modal_cargar_archivo').modal('show');
@@ -778,66 +809,11 @@ class PlanesAccionClientes {
   }
 
   /**
-   * Crear nueva carpeta
+   * Crear nueva carpeta (modificado para usar navegador)
    */
   async crearNuevaCarpeta() {
-    try {
-      const idCliente = document.getElementById('id_cliente_archivo').value;
-      const idPlanAccion = document.getElementById('id_plan_accion_archivo').value;
-      const nombreCarpeta = document.getElementById('nombre_nueva_carpeta').value.trim();
-
-      if (!nombreCarpeta) {
-        this.mostrarError("Error", "Debe ingresar un nombre para la carpeta");
-        return;
-      }
-
-      this.mostrarCargando(true, "Creando carpeta...", "Creando nueva carpeta en Google Drive");
-
-      const formData = new FormData();
-      formData.append('id_cliente', idCliente);
-      formData.append('id_plan_accion', idPlanAccion);
-      formData.append('nombre_carpeta', nombreCarpeta);
-
-      const response = await fetch('ajax/crear_carpeta_drive.php', {
-        method: 'POST',
-        body: formData
-      });
-
-      const data = await response.json();
-      this.mostrarCargando(false);
-
-      if (data.success) {
-        this.mostrarExito("Carpeta creada", "La carpeta se creó exitosamente");
-        
-        // Limpiar campo de nombre
-        document.getElementById('nombre_nueva_carpeta').value = '';
-        
-        // Recargar carpetas disponibles
-        await this.cargarCarpetasDisponibles(idCliente, idPlanAccion);
-        
-        // Seleccionar la nueva carpeta creada
-        const selectCarpeta = document.getElementById('select_carpeta_destino');
-        if (data.data && data.data.id_carpeta_drive) {
-          selectCarpeta.value = data.data.id_carpeta_drive;
-        }
-        
-        // Desmarcar checkbox de crear carpeta
-        document.getElementById('crear_nueva_carpeta').checked = false;
-        this.toggleNuevaCarpeta(false);
-        
-        return true;
-        
-      } else {
-        this.mostrarError(data.title || "Error", data.message || "No se pudo crear la carpeta");
-        return false;
-      }
-
-    } catch (error) {
-      this.mostrarCargando(false);
-      console.error("Error creando carpeta:", error);
-      this.mostrarError("Error", "Error inesperado al crear la carpeta");
-      return false;
-    }
+    const idCarpetaPadre = this.carpetaPadreParaCrear || null;
+    return await this.crearNuevaCarpetaModificado(idCarpetaPadre);
   }
 
   /**
@@ -867,33 +843,27 @@ class PlanesAccionClientes {
         return;
       }
 
-      // Validar que se seleccione carpeta o se cree nueva
-      const crearNueva = document.getElementById('crear_nueva_carpeta').checked;
-      const carpetaDestino = formData.get('carpeta_destino');
-      const nombreNuevaCarpeta = formData.get('nombre_nueva_carpeta');
+      // Obtener carpeta destino del navegador o del campo oculto
+      const inputCarpetaNavegador = document.getElementById('carpeta_destino_navegador');
+      const carpetaDestino = inputCarpetaNavegador ? inputCarpetaNavegador.value : null;
 
-      if (!crearNueva && !carpetaDestino) {
-        this.mostrarError("Error", "Debe seleccionar una carpeta de destino");
+      // Validar que se haya seleccionado una carpeta
+      if (!carpetaDestino || carpetaDestino.trim() === '') {
+        this.mostrarError("Error", "Debe seleccionar una carpeta de destino en el navegador");
         this.mostrarCargando(false);
         return;
       }
 
-      if (crearNueva && !nombreNuevaCarpeta.trim()) {
-        this.mostrarError("Error", "Debe especificar el nombre de la nueva carpeta");
+      // Validar que la carpeta seleccionada existe en el DOM (verificación básica)
+      const carpetaItem = document.querySelector(`[data-id-carpeta="${carpetaDestino}"]`);
+      if (!carpetaItem) {
+        this.mostrarError("Error", "La carpeta seleccionada no es válida. Por favor, seleccione otra carpeta.");
         this.mostrarCargando(false);
         return;
       }
 
-      // Si se está creando una nueva carpeta, primero crearla
-      if (crearNueva) {
-        const resultadoCrear = await this.crearNuevaCarpeta();
-        if (!resultadoCrear) {
-          this.mostrarCargando(false);
-          return;
-        }
-        // Actualizar el formData con la nueva carpeta
-        formData.set('carpeta_destino', document.getElementById('select_carpeta_destino').value);
-      }
+      // Agregar carpeta destino al formData
+      formData.set('carpeta_destino', carpetaDestino);
 
       const response = await fetch("sql/subir_archivo_drive.php", {
         method: "POST",
@@ -905,6 +875,8 @@ class PlanesAccionClientes {
       this.manejarRespuesta(data, 'subir');
 
       if (data.success) {
+        // Limpiar estado antes de cerrar
+        this.limpiarEstadoModalCarga();
         $('#modal_cargar_archivo').modal('hide');
         form.reset();
         this.toggleNuevaCarpeta(false);
@@ -2513,6 +2485,654 @@ class PlanesAccionClientes {
         text: 'Ocurrió un error al procesar el archivo',
         confirmButtonText: 'Aceptar'
       });
+    }
+  }
+
+  // ========== NUEVO SISTEMA DE NAVEGADOR DE CARPETAS ==========
+
+  /**
+   * Cargar estructura completa de carpetas
+   */
+  async cargarEstructuraCompletaCarpetas(idCliente, idPlanAccion) {
+    try {
+      const response = await fetch(`ajax/obtener_estructura_carpetas_completa.php?id_cliente=${idCliente}&id_plan_accion=${idPlanAccion}`);
+      
+      if (!response.ok) {
+        console.error("Error en respuesta HTTP:", response.status);
+        return null;
+      }
+      
+      const data = await response.json();
+
+      // Validar estructura de respuesta
+      if (data && data.success && data.data && Array.isArray(data.data) && data.data.length > 0) {
+        const estructura = data.data[0];
+        // Validar que la estructura tenga al menos un id_carpeta_drive
+        if (estructura && estructura.id_carpeta_drive) {
+          return estructura; // Retornar el árbol completo
+        }
+      }
+      
+      // Si no hay datos pero la respuesta fue exitosa, retornar objeto vacío válido
+      if (data && data.success) {
+        return null; // No hay carpetas, pero la operación fue exitosa
+      }
+      
+      return null;
+    } catch (error) {
+      console.error("Error cargando estructura de carpetas:", error);
+      return null;
+    }
+  }
+
+  /**
+   * Renderizar árbol de carpetas
+   */
+  renderizarArbolCarpetas(estructura, contenedorId = 'navegador_carpetas', nivel = 0) {
+    const contenedor = document.getElementById(contenedorId);
+    if (!contenedor) return;
+
+    // Validar estructura
+    if (!estructura || typeof estructura !== 'object') {
+      contenedor.innerHTML = '<div class="text-muted text-center p-3"><i class="fa fa-folder-open"></i> No hay carpetas disponibles</div>';
+      return;
+    }
+
+    // Si no tiene subcarpetas pero es la carpeta raíz, permitir seleccionarla
+    if (!estructura.subcarpetas || estructura.subcarpetas.length === 0) {
+      // Si es la carpeta raíz del plan, mostrarla como seleccionable
+      if (estructura.tipo_carpeta === 'plan_accion' && estructura.id_carpeta_drive) {
+        let html = '<ul class="arbol-carpetas">';
+        html += `
+          <li class="carpeta-item nivel-0 seleccionable-raiz" data-id-carpeta="${estructura.id_carpeta_drive}" data-nivel="0">
+            <div class="carpeta-contenedor">
+              <span class="carpeta-expandir sin-hijos">
+                <i class="fa fa-minus"></i>
+              </span>
+              <span class="carpeta-icono" onclick="planesAccion.seleccionarCarpetaNavegador('${estructura.id_carpeta_drive}', '${this.escapeHtml(estructura.nombre_carpeta)}')">
+                <i class="fa fa-folder"></i>
+              </span>
+              <span class="carpeta-nombre" onclick="planesAccion.seleccionarCarpetaNavegador('${estructura.id_carpeta_drive}', '${this.escapeHtml(estructura.nombre_carpeta)}')">
+                ${this.escapeHtml(estructura.nombre_carpeta)} (Raíz)
+              </span>
+              <span class="carpeta-info">
+                ${estructura.cantidad_archivos > 0 ? `<span class="badge badge-info">${estructura.cantidad_archivos} archivos</span>` : ''}
+              </span>
+              <span class="carpeta-acciones">
+                <button class="btn btn-sm btn-success" 
+                        onclick="planesAccion.mostrarModalCrearCarpeta('${estructura.id_carpeta_drive}')" 
+                        title="Crear carpeta aquí">
+                  <i class="fa fa-plus"></i>
+                </button>
+              </span>
+            </div>
+          </li>
+        `;
+        html += '</ul>';
+        contenedor.innerHTML = html;
+        return;
+      }
+      contenedor.innerHTML = '<div class="text-muted text-center p-3"><i class="fa fa-folder-open"></i> No hay carpetas disponibles</div>';
+      return;
+    }
+
+    let html = '<ul class="arbol-carpetas">';
+    
+    estructura.subcarpetas.forEach(carpeta => {
+      const tieneSubcarpetas = carpeta.cantidad_subcarpetas > 0;
+      const tieneArchivos = carpeta.cantidad_archivos > 0;
+      const nivelClass = `nivel-${carpeta.nivel || nivel}`;
+      
+      html += `
+        <li class="carpeta-item ${nivelClass}" data-id-carpeta="${carpeta.id_carpeta_drive}" data-nivel="${carpeta.nivel || nivel}">
+          <div class="carpeta-contenedor">
+            <span class="carpeta-expandir ${tieneSubcarpetas ? '' : 'sin-hijos'}" 
+                  onclick="planesAccion.toggleCarpeta('${carpeta.id_carpeta_drive}')">
+              <i class="fa ${tieneSubcarpetas ? 'fa-chevron-right' : 'fa-minus'}"></i>
+            </span>
+            <span class="carpeta-icono" onclick="planesAccion.seleccionarCarpetaNavegador('${carpeta.id_carpeta_drive}', '${this.escapeHtml(carpeta.nombre_carpeta)}')">
+              <i class="fa fa-folder"></i>
+            </span>
+            <span class="carpeta-nombre" onclick="planesAccion.seleccionarCarpetaNavegador('${carpeta.id_carpeta_drive}', '${this.escapeHtml(carpeta.nombre_carpeta)}')">
+              ${this.escapeHtml(carpeta.nombre_carpeta)}
+            </span>
+            <span class="carpeta-info">
+              ${tieneArchivos ? `<span class="badge badge-info">${carpeta.cantidad_archivos} archivos</span>` : ''}
+              ${tieneSubcarpetas ? `<span class="badge badge-secondary">${carpeta.cantidad_subcarpetas} carpetas</span>` : ''}
+            </span>
+            <span class="carpeta-acciones">
+              <button class="btn btn-sm btn-success" 
+                      onclick="planesAccion.mostrarModalCrearCarpeta('${carpeta.id_carpeta_drive}')" 
+                      title="Crear carpeta aquí">
+                <i class="fa fa-plus"></i>
+              </button>
+            </span>
+          </div>
+          <ul class="subcarpetas" id="subcarpetas-${carpeta.id_carpeta_drive}" style="display: none;">
+            ${this.renderizarSubcarpetas(carpeta.subcarpetas || [], carpeta.nivel + 1)}
+          </ul>
+        </li>
+      `;
+    });
+
+    html += '</ul>';
+    contenedor.innerHTML = html;
+  }
+
+  /**
+   * Renderizar subcarpetas recursivamente
+   */
+  renderizarSubcarpetas(subcarpetas, nivel) {
+    if (!subcarpetas || subcarpetas.length === 0) return '';
+
+    let html = '';
+    subcarpetas.forEach(carpeta => {
+      const tieneSubcarpetas = carpeta.cantidad_subcarpetas > 0;
+      const tieneArchivos = carpeta.cantidad_archivos > 0;
+      
+      html += `
+        <li class="carpeta-item nivel-${nivel}" data-id-carpeta="${carpeta.id_carpeta_drive}" data-nivel="${nivel}">
+          <div class="carpeta-contenedor">
+            <span class="carpeta-expandir ${tieneSubcarpetas ? '' : 'sin-hijos'}" 
+                  onclick="planesAccion.toggleCarpeta('${carpeta.id_carpeta_drive}')">
+              <i class="fa ${tieneSubcarpetas ? 'fa-chevron-right' : 'fa-minus'}"></i>
+            </span>
+            <span class="carpeta-icono" onclick="planesAccion.seleccionarCarpetaNavegador('${carpeta.id_carpeta_drive}', '${this.escapeHtml(carpeta.nombre_carpeta)}')">
+              <i class="fa fa-folder"></i>
+            </span>
+            <span class="carpeta-nombre" onclick="planesAccion.seleccionarCarpetaNavegador('${carpeta.id_carpeta_drive}', '${this.escapeHtml(carpeta.nombre_carpeta)}')">
+              ${this.escapeHtml(carpeta.nombre_carpeta)}
+            </span>
+            <span class="carpeta-info">
+              ${tieneArchivos ? `<span class="badge badge-info">${carpeta.cantidad_archivos}</span>` : ''}
+              ${tieneSubcarpetas ? `<span class="badge badge-secondary">${carpeta.cantidad_subcarpetas}</span>` : ''}
+            </span>
+            <span class="carpeta-acciones">
+              <button class="btn btn-sm btn-success" 
+                      onclick="planesAccion.mostrarModalCrearCarpeta('${carpeta.id_carpeta_drive}')" 
+                      title="Crear carpeta aquí">
+                <i class="fa fa-plus"></i>
+              </button>
+            </span>
+          </div>
+          <ul class="subcarpetas" id="subcarpetas-${carpeta.id_carpeta_drive}" style="display: none;">
+            ${this.renderizarSubcarpetas(carpeta.subcarpetas || [], nivel + 1)}
+          </ul>
+        </li>
+      `;
+    });
+    return html;
+  }
+
+  /**
+   * Expandir/colapsar carpeta
+   */
+  async toggleCarpeta(idCarpetaDrive) {
+    const subcarpetasDiv = document.getElementById(`subcarpetas-${idCarpetaDrive}`);
+    if (!subcarpetasDiv) return;
+
+    // Buscar el botón de expandir de forma más robusta
+    const carpetaItem = subcarpetasDiv.closest('.carpeta-item') || subcarpetasDiv.parentElement;
+    let expandirBtn = null;
+    let icono = null;
+    
+    if (carpetaItem) {
+      expandirBtn = carpetaItem.querySelector('.carpeta-expandir');
+      if (expandirBtn) {
+        icono = expandirBtn.querySelector('i');
+      }
+    }
+    
+    // Si no se encontró, intentar con previousElementSibling como fallback
+    if (!expandirBtn && subcarpetasDiv.previousElementSibling) {
+      expandirBtn = subcarpetasDiv.previousElementSibling.querySelector('.carpeta-expandir');
+      if (expandirBtn) {
+        icono = expandirBtn.querySelector('i');
+      }
+    }
+
+    if (subcarpetasDiv.style.display === 'none') {
+      // Expandir
+      subcarpetasDiv.style.display = 'block';
+      if (icono) {
+        icono.classList.remove('fa-chevron-right');
+        icono.classList.add('fa-chevron-down');
+      }
+
+      // Si no tiene contenido cargado Y no tiene subcarpetas ya renderizadas, cargarlo
+      const tieneContenido = subcarpetasDiv.innerHTML.trim() !== '';
+      const tieneSubcarpetasRenderizadas = subcarpetasDiv.querySelectorAll('.carpeta-item').length > 0;
+      
+      if (!tieneContenido && !tieneSubcarpetasRenderizadas) {
+        await this.cargarSubcarpetas(idCarpetaDrive, subcarpetasDiv);
+      }
+    } else {
+      // Colapsar
+      subcarpetasDiv.style.display = 'none';
+      if (icono) {
+        icono.classList.remove('fa-chevron-down');
+        icono.classList.add('fa-chevron-right');
+      }
+    }
+  }
+
+  /**
+   * Cargar subcarpetas de una carpeta específica (lazy loading)
+   */
+  async cargarSubcarpetas(idCarpetaPadre, contenedor) {
+    try {
+      const idCliente = document.getElementById('id_cliente_archivo').value;
+      const idPlanAccion = document.getElementById('id_plan_accion_archivo').value;
+
+      if (!idCliente || !idPlanAccion) {
+        console.warn('No se pueden cargar subcarpetas: faltan ID de cliente o plan de acción');
+        return;
+      }
+
+      // Verificar que el contenedor no tenga ya contenido renderizado
+      if (!contenedor) {
+        console.warn('No se puede cargar subcarpetas: contenedor no encontrado');
+        return;
+      }
+
+      // Verificar que no haya subcarpetas ya cargadas para evitar duplicados
+      const subcarpetasExistentes = contenedor.querySelectorAll('.carpeta-item');
+      if (subcarpetasExistentes.length > 0) {
+        console.log('Las subcarpetas ya están cargadas, omitiendo carga');
+        return;
+      }
+
+      // Mostrar indicador de carga en el contenedor
+      const contenidoAnterior = contenedor.innerHTML;
+      contenedor.innerHTML = '<li class="text-center text-muted p-2"><i class="fa fa-spinner fa-spin"></i> Cargando...</li>';
+
+      const response = await fetch(`ajax/obtener_subcarpetas.php?id_cliente=${idCliente}&id_plan_accion=${idPlanAccion}&id_carpeta_padre=${idCarpetaPadre}`);
+      
+      if (!response.ok) {
+        console.error('Error en respuesta HTTP al cargar subcarpetas:', response.status);
+        contenedor.innerHTML = '<li class="text-center text-danger p-2"><i class="fa fa-exclamation-triangle"></i> Error al cargar subcarpetas</li>';
+        // Restaurar contenido anterior después de 2 segundos
+        setTimeout(() => {
+          if (contenedor.innerHTML.includes('Error al cargar')) {
+            contenedor.innerHTML = contenidoAnterior;
+          }
+        }, 2000);
+        return;
+      }
+
+      const data = await response.json();
+
+      if (data && data.success && data.data && Array.isArray(data.data)) {
+        // Verificar nuevamente que no se hayan agregado subcarpetas mientras se hacía la petición
+        const subcarpetasExistentesDespues = contenedor.querySelectorAll('.carpeta-item');
+        if (subcarpetasExistentesDespues.length > 0) {
+          console.log('Las subcarpetas se cargaron mientras se hacía la petición, omitiendo');
+          return;
+        }
+
+        let html = '';
+        data.data.forEach(carpeta => {
+          const tieneSubcarpetas = carpeta.cantidad_subcarpetas > 0;
+          const tieneArchivos = carpeta.cantidad_archivos > 0;
+          
+          html += `
+            <li class="carpeta-item" data-id-carpeta="${carpeta.id_carpeta_drive}">
+              <div class="carpeta-contenedor">
+                <span class="carpeta-expandir ${tieneSubcarpetas ? '' : 'sin-hijos'}" 
+                      onclick="planesAccion.toggleCarpeta('${carpeta.id_carpeta_drive}')">
+                  <i class="fa ${tieneSubcarpetas ? 'fa-chevron-right' : 'fa-minus'}"></i>
+                </span>
+                <span class="carpeta-icono" onclick="planesAccion.seleccionarCarpetaNavegador('${carpeta.id_carpeta_drive}', '${this.escapeHtml(carpeta.nombre_carpeta)}')">
+                  <i class="fa fa-folder"></i>
+                </span>
+                <span class="carpeta-nombre" onclick="planesAccion.seleccionarCarpetaNavegador('${carpeta.id_carpeta_drive}', '${this.escapeHtml(carpeta.nombre_carpeta)}')">
+                  ${this.escapeHtml(carpeta.nombre_carpeta)}
+                </span>
+                <span class="carpeta-info">
+                  ${tieneArchivos ? `<span class="badge badge-info">${carpeta.cantidad_archivos}</span>` : ''}
+                  ${tieneSubcarpetas ? `<span class="badge badge-secondary">${carpeta.cantidad_subcarpetas}</span>` : ''}
+                </span>
+                <span class="carpeta-acciones">
+                  <button class="btn btn-sm btn-success" 
+                          onclick="planesAccion.mostrarModalCrearCarpeta('${carpeta.id_carpeta_drive}')" 
+                          title="Crear carpeta aquí">
+                    <i class="fa fa-plus"></i>
+                  </button>
+                </span>
+              </div>
+              <ul class="subcarpetas" id="subcarpetas-${carpeta.id_carpeta_drive}" style="display: none;"></ul>
+            </li>
+          `;
+        });
+        contenedor.innerHTML = html;
+      } else {
+        // No hay subcarpetas o error en la respuesta
+        if (data && !data.success) {
+          contenedor.innerHTML = `<li class="text-center text-warning p-2"><i class="fa fa-info-circle"></i> ${data.message || 'No se pudieron cargar las subcarpetas'}</li>`;
+        } else {
+          contenedor.innerHTML = '<li class="text-center text-muted p-2"><i class="fa fa-folder-open"></i> No hay subcarpetas</li>';
+        }
+      }
+    } catch (error) {
+      console.error("Error cargando subcarpetas:", error);
+      contenedor.innerHTML = '<li class="text-center text-danger p-2"><i class="fa fa-exclamation-triangle"></i> Error inesperado al cargar subcarpetas</li>';
+    }
+  }
+
+  /**
+   * Seleccionar carpeta en el navegador
+   */
+  seleccionarCarpetaNavegador(idCarpetaDrive, nombreCarpeta) {
+    // Remover selección anterior
+    document.querySelectorAll('.carpeta-item').forEach(item => {
+      item.classList.remove('seleccionada');
+    });
+
+    // Agregar selección a la carpeta actual
+    const carpetaItem = document.querySelector(`[data-id-carpeta="${idCarpetaDrive}"]`);
+    if (carpetaItem) {
+      carpetaItem.classList.add('seleccionada');
+    }
+
+    // Guardar carpeta seleccionada
+    this.carpetaSeleccionada = {
+      id: idCarpetaDrive,
+      nombre: nombreCarpeta
+    };
+
+    // Actualizar campo oculto para el formulario
+    const inputCarpeta = document.getElementById('carpeta_destino_navegador');
+    if (inputCarpeta) {
+      inputCarpeta.value = idCarpetaDrive;
+    }
+
+    // Mostrar feedback visual menos intrusivo (indicador en lugar de modal)
+    const contenedor = document.getElementById('navegador_carpetas');
+    if (contenedor) {
+      // Remover mensaje anterior si existe
+      const mensajeAnterior = contenedor.querySelector('.mensaje-seleccion-carpeta');
+      if (mensajeAnterior) {
+        mensajeAnterior.remove();
+      }
+      
+      // Crear mensaje de selección
+      const mensaje = document.createElement('div');
+      mensaje.className = 'mensaje-seleccion-carpeta alert alert-info alert-dismissible fade show mt-2';
+      mensaje.innerHTML = `
+        <i class="fa fa-check-circle"></i> Carpeta seleccionada: <strong>${this.escapeHtml(nombreCarpeta)}</strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      `;
+      contenedor.insertBefore(mensaje, contenedor.firstChild);
+      
+      // Auto-ocultar después de 3 segundos
+      setTimeout(() => {
+        if (mensaje && mensaje.parentNode) {
+          mensaje.classList.remove('show');
+          setTimeout(() => {
+            if (mensaje && mensaje.parentNode) {
+              mensaje.remove();
+            }
+          }, 300);
+        }
+      }, 3000);
+    }
+  }
+
+  /**
+   * Mostrar modal para crear carpeta en ubicación específica
+   */
+  mostrarModalCrearCarpeta(idCarpetaPadre) {
+    this.carpetaPadreParaCrear = idCarpetaPadre;
+    
+    Swal.fire({
+      title: 'Crear Nueva Carpeta',
+      html: `
+        <input type="text" id="nombre_carpeta_nueva" class="swal2-input" placeholder="Nombre de la carpeta">
+        <p class="text-muted">La carpeta se creará dentro de la carpeta seleccionada</p>
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Crear',
+      cancelButtonText: 'Cancelar',
+      inputValidator: (value) => {
+        if (!value) {
+          return 'Debe ingresar un nombre para la carpeta';
+        }
+      },
+      preConfirm: async () => {
+        const nombre = document.getElementById('nombre_carpeta_nueva').value.trim();
+        return await this.crearCarpetaEnUbicacion(nombre, idCarpetaPadre);
+      }
+    });
+  }
+
+  /**
+   * Crear carpeta en ubicación específica
+   */
+  async crearCarpetaEnUbicacion(nombreCarpeta, idCarpetaPadre) {
+    try {
+      const idCliente = document.getElementById('id_cliente_archivo').value;
+      const idPlanAccion = document.getElementById('id_plan_accion_archivo').value;
+
+      if (!nombreCarpeta) {
+        Swal.showValidationMessage('Debe ingresar un nombre para la carpeta');
+        return false;
+      }
+
+      const formData = new FormData();
+      formData.append('id_cliente', idCliente);
+      formData.append('id_plan_accion', idPlanAccion);
+      formData.append('nombre_carpeta', nombreCarpeta);
+      formData.append('id_carpeta_padre', idCarpetaPadre);
+
+      const response = await fetch('ajax/crear_carpeta_drive.php', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.data) {
+        // data.data puede ser un array o un objeto único
+        let carpetaCreada;
+        if (Array.isArray(data.data) && data.data.length > 0) {
+          carpetaCreada = data.data[0];
+        } else if (typeof data.data === 'object') {
+          carpetaCreada = data.data;
+        }
+        
+        if (carpetaCreada) {
+          const idCarpetaCreada = carpetaCreada.id_carpeta_drive || carpetaCreada.id;
+          const nombreCarpetaCreada = carpetaCreada.nombre_carpeta || carpetaCreada.nombre;
+          
+          if (idCarpetaCreada) {
+            // Recargar estructura de carpetas y seleccionar la carpeta creada
+            await this.recargarNavegadorCarpetas(idCarpetaCreada, nombreCarpetaCreada);
+            return true;
+          }
+        }
+        
+        // Si no hay datos de carpeta pero fue exitoso, solo recargar
+        await this.recargarNavegadorCarpetas();
+        return true;
+      } else {
+        Swal.showValidationMessage(data.message || data.title || 'Error al crear la carpeta');
+        return false;
+      }
+    } catch (error) {
+      console.error("Error creando carpeta:", error);
+      Swal.showValidationMessage('Error inesperado al crear la carpeta');
+      return false;
+    }
+  }
+
+  /**
+   * Recargar navegador de carpetas
+   * @param {string} idCarpetaSeleccionar - ID de carpeta a seleccionar después de recargar (opcional)
+   * @param {string} nombreCarpetaSeleccionar - Nombre de carpeta para mostrar en mensaje (opcional)
+   */
+  async recargarNavegadorCarpetas(idCarpetaSeleccionar = null, nombreCarpetaSeleccionar = null) {
+    const idCliente = document.getElementById('id_cliente_archivo').value;
+    const idPlanAccion = document.getElementById('id_plan_accion_archivo').value;
+
+    if (!idCliente || !idPlanAccion) return;
+
+    // Guardar carpeta seleccionada actualmente si no se especifica una nueva
+    if (!idCarpetaSeleccionar && this.carpetaSeleccionada) {
+      idCarpetaSeleccionar = this.carpetaSeleccionada.id;
+      nombreCarpetaSeleccionar = this.carpetaSeleccionada.nombre;
+    }
+
+    // Mostrar indicador de carga
+    const navegador = document.getElementById('navegador_carpetas');
+    if (navegador) {
+      const contenidoAnterior = navegador.innerHTML;
+      navegador.innerHTML = '<div class="text-center text-muted p-3"><i class="fa fa-spinner fa-spin"></i> Recargando carpetas...</div>';
+      
+      try {
+        const estructura = await this.cargarEstructuraCompletaCarpetas(idCliente, idPlanAccion);
+        if (estructura) {
+          this.renderizarArbolCarpetas(estructura);
+          
+          // Seleccionar carpeta si se especificó
+          if (idCarpetaSeleccionar) {
+            // Función para intentar seleccionar la carpeta con reintentos
+            const intentarSeleccionar = (intentos = 0) => {
+              const maxIntentos = 10; // Máximo 1 segundo (10 * 100ms)
+              const carpetaItem = document.querySelector(`[data-id-carpeta="${idCarpetaSeleccionar}"]`);
+              
+              if (carpetaItem) {
+                // Carpeta encontrada, seleccionarla
+                this.seleccionarCarpetaNavegador(idCarpetaSeleccionar, nombreCarpetaSeleccionar || 'Carpeta seleccionada');
+              } else if (intentos < maxIntentos) {
+                // Carpeta no encontrada aún, reintentar después de 100ms
+                setTimeout(() => intentarSeleccionar(intentos + 1), 100);
+              } else {
+                // No se encontró la carpeta después de varios intentos
+                console.warn(`No se pudo encontrar la carpeta ${idCarpetaSeleccionar} para seleccionar`);
+              }
+            };
+            
+            // Iniciar intentos después de un breve delay inicial
+            setTimeout(() => intentarSeleccionar(), 50);
+          }
+        } else {
+          navegador.innerHTML = '<div class="text-muted text-center p-3"><i class="fa fa-folder-open"></i> No hay carpetas disponibles</div>';
+        }
+      } catch (error) {
+        console.error("Error recargando navegador:", error);
+        navegador.innerHTML = contenidoAnterior || '<div class="text-danger text-center p-3"><i class="fa fa-exclamation-triangle"></i> Error al recargar carpetas</div>';
+      }
+    }
+  }
+
+  /**
+   * Limpiar estado del modal de carga
+   */
+  limpiarEstadoModalCarga() {
+    // Limpiar selección
+    this.carpetaSeleccionada = null;
+    this.carpetaPadreParaCrear = null;
+
+    // Limpiar campo oculto
+    const inputCarpeta = document.getElementById('carpeta_destino_navegador');
+    if (inputCarpeta) {
+      inputCarpeta.value = '';
+    }
+
+    // Remover selección visual
+    document.querySelectorAll('.carpeta-item').forEach(item => {
+      item.classList.remove('seleccionada');
+    });
+
+    // Remover mensaje de selección
+    const navegador = document.getElementById('navegador_carpetas');
+    if (navegador) {
+      const mensaje = navegador.querySelector('.mensaje-seleccion-carpeta');
+      if (mensaje) {
+        mensaje.remove();
+      }
+    }
+  }
+
+  /**
+   * Configurar eventos del modal de carga
+   */
+  configurarEventosModalCarga() {
+    // Remover eventos anteriores para evitar duplicados
+    $('#modal_cargar_archivo').off('hidden.bs.modal');
+    
+    // Limpiar estado cuando se cierra el modal
+    $('#modal_cargar_archivo').on('hidden.bs.modal', () => {
+      this.limpiarEstadoModalCarga();
+    });
+  }
+
+  /**
+   * Escapar HTML para prevenir XSS
+   */
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  /**
+   * Modificar crearNuevaCarpeta para usar carpeta padre si está definida
+   */
+  async crearNuevaCarpetaModificado(idCarpetaPadre = null) {
+    try {
+      const idCliente = document.getElementById('id_cliente_archivo').value;
+      const idPlanAccion = document.getElementById('id_plan_accion_archivo').value;
+      const nombreCarpeta = document.getElementById('nombre_nueva_carpeta').value.trim();
+
+      if (!nombreCarpeta) {
+        this.mostrarError("Error", "Debe ingresar un nombre para la carpeta");
+        return false;
+      }
+
+      this.mostrarCargando(true, "Creando carpeta...", "Creando nueva carpeta en Google Drive");
+
+      const formData = new FormData();
+      formData.append('id_cliente', idCliente);
+      formData.append('id_plan_accion', idPlanAccion);
+      formData.append('nombre_carpeta', nombreCarpeta);
+      if (idCarpetaPadre) {
+        formData.append('id_carpeta_padre', idCarpetaPadre);
+      }
+
+      const response = await fetch('ajax/crear_carpeta_drive.php', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json();
+      this.mostrarCargando(false);
+
+      if (data.success) {
+        this.mostrarExito("Carpeta creada", "La carpeta se creó exitosamente");
+        
+        // Limpiar campo de nombre
+        document.getElementById('nombre_nueva_carpeta').value = '';
+        
+        // Recargar navegador de carpetas
+        await this.recargarNavegadorCarpetas();
+        
+        // Desmarcar checkbox de crear carpeta
+        document.getElementById('crear_nueva_carpeta').checked = false;
+        this.toggleNuevaCarpeta(false);
+        
+        return true;
+      } else {
+        this.mostrarError(data.title || "Error", data.message || "No se pudo crear la carpeta");
+        return false;
+      }
+    } catch (error) {
+      this.mostrarCargando(false);
+      console.error("Error creando carpeta:", error);
+      this.mostrarError("Error", "Error inesperado al crear la carpeta");
+      return false;
     }
   }
 }
