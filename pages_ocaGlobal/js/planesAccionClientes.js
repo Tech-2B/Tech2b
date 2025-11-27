@@ -483,10 +483,10 @@ class PlanesAccionClientes {
       // Cargar estructura completa de carpetas en el navegador
       const estructura = await this.cargarEstructuraCompletaCarpetas(idCliente, idPlanAccion);
       if (estructura) {
-        this.renderizarArbolCarpetas(estructura);
+        await this.renderizarArbolCarpetas(estructura);
       } else {
-        document.getElementById('navegador_carpetas').innerHTML = 
-          '<div class="text-muted text-center p-3"><i class="fa fa-folder-open"></i> No hay carpetas disponibles. Crea una nueva carpeta.</div>';
+        // Si no hay estructura, obtener la carpeta raíz para poder crear la primera carpeta
+        await this.mostrarBotonCrearPrimeraCarpeta(idCliente, idPlanAccion);
       }
 
       // Configurar evento de limpieza al cerrar el modal
@@ -2526,15 +2526,89 @@ class PlanesAccionClientes {
   }
 
   /**
+   * Mostrar botón para crear la primera carpeta cuando no hay carpetas disponibles
+   */
+  async mostrarBotonCrearPrimeraCarpeta(idCliente, idPlanAccion) {
+    try {
+      const contenedor = document.getElementById('navegador_carpetas');
+      if (!contenedor) return;
+
+      // Obtener carpeta raíz del plan
+      const response = await fetch(`ajax/obtener_carpeta_raiz_plan.php?id_cliente=${idCliente}&id_plan_accion=${idPlanAccion}`);
+      
+      if (!response.ok) {
+        contenedor.innerHTML = `
+          <div class="text-muted text-center p-3">
+            <i class="fa fa-folder-open"></i> No hay carpetas disponibles.
+            <br>
+            <button class="btn btn-success btn-sm mt-2" onclick="planesAccion.mostrarModalCrearCarpeta(null)">
+              <i class="fa fa-plus"></i> Crear primera carpeta
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      const data = await response.json();
+      
+      if (data && data.success && data.data && data.data.id_carpeta_drive) {
+        const carpetaRaiz = data.data;
+        contenedor.innerHTML = `
+          <div class="text-muted text-center p-3">
+            <i class="fa fa-folder-open fa-2x mb-2"></i>
+            <p>No hay carpetas disponibles. Crea la primera carpeta.</p>
+            <button class="btn btn-success btn-sm mt-2" 
+                    onclick="planesAccion.mostrarModalCrearCarpeta('${carpetaRaiz.id_carpeta_drive}')"
+                    title="Crear carpeta en la raíz del plan">
+              <i class="fa fa-plus"></i> Crear primera carpeta
+            </button>
+          </div>
+        `;
+      } else {
+        contenedor.innerHTML = `
+          <div class="text-muted text-center p-3">
+            <i class="fa fa-folder-open"></i> No hay carpetas disponibles.
+            <br>
+            <button class="btn btn-success btn-sm mt-2" onclick="planesAccion.mostrarModalCrearCarpeta(null)">
+              <i class="fa fa-plus"></i> Crear primera carpeta
+            </button>
+          </div>
+        `;
+      }
+    } catch (error) {
+      console.error("Error obteniendo carpeta raíz:", error);
+      const contenedor = document.getElementById('navegador_carpetas');
+      if (contenedor) {
+        contenedor.innerHTML = `
+          <div class="text-muted text-center p-3">
+            <i class="fa fa-folder-open"></i> No hay carpetas disponibles.
+            <br>
+            <button class="btn btn-success btn-sm mt-2" onclick="planesAccion.mostrarModalCrearCarpeta(null)">
+              <i class="fa fa-plus"></i> Crear primera carpeta
+            </button>
+          </div>
+        `;
+      }
+    }
+  }
+
+  /**
    * Renderizar árbol de carpetas
    */
-  renderizarArbolCarpetas(estructura, contenedorId = 'navegador_carpetas', nivel = 0) {
+  async renderizarArbolCarpetas(estructura, contenedorId = 'navegador_carpetas', nivel = 0) {
     const contenedor = document.getElementById(contenedorId);
     if (!contenedor) return;
 
     // Validar estructura
     if (!estructura || typeof estructura !== 'object') {
-      contenedor.innerHTML = '<div class="text-muted text-center p-3"><i class="fa fa-folder-open"></i> No hay carpetas disponibles</div>';
+      // Intentar mostrar botón para crear primera carpeta
+      const idCliente = document.getElementById('id_cliente_archivo')?.value;
+      const idPlanAccion = document.getElementById('id_plan_accion_archivo')?.value;
+      if (idCliente && idPlanAccion) {
+        await this.mostrarBotonCrearPrimeraCarpeta(idCliente, idPlanAccion);
+      } else {
+        contenedor.innerHTML = '<div class="text-muted text-center p-3"><i class="fa fa-folder-open"></i> No hay carpetas disponibles</div>';
+      }
       return;
     }
 
@@ -2572,7 +2646,14 @@ class PlanesAccionClientes {
         contenedor.innerHTML = html;
         return;
       }
-      contenedor.innerHTML = '<div class="text-muted text-center p-3"><i class="fa fa-folder-open"></i> No hay carpetas disponibles</div>';
+      // Si no es carpeta raíz válida, mostrar botón para crear primera carpeta
+      const idCliente = document.getElementById('id_cliente_archivo')?.value;
+      const idPlanAccion = document.getElementById('id_plan_accion_archivo')?.value;
+      if (idCliente && idPlanAccion) {
+        await this.mostrarBotonCrearPrimeraCarpeta(idCliente, idPlanAccion);
+      } else {
+        contenedor.innerHTML = '<div class="text-muted text-center p-3"><i class="fa fa-folder-open"></i> No hay carpetas disponibles</div>';
+      }
       return;
     }
 
@@ -2993,7 +3074,7 @@ class PlanesAccionClientes {
       try {
         const estructura = await this.cargarEstructuraCompletaCarpetas(idCliente, idPlanAccion);
         if (estructura) {
-          this.renderizarArbolCarpetas(estructura);
+          await this.renderizarArbolCarpetas(estructura);
           
           // Seleccionar carpeta si se especificó
           if (idCarpetaSeleccionar) {
@@ -3018,7 +3099,8 @@ class PlanesAccionClientes {
             setTimeout(() => intentarSeleccionar(), 50);
           }
         } else {
-          navegador.innerHTML = '<div class="text-muted text-center p-3"><i class="fa fa-folder-open"></i> No hay carpetas disponibles</div>';
+          // Si no hay estructura, mostrar botón para crear primera carpeta
+          await this.mostrarBotonCrearPrimeraCarpeta(idCliente, idPlanAccion);
         }
       } catch (error) {
         console.error("Error recargando navegador:", error);

@@ -902,7 +902,7 @@ class FuncionesGoogleDrive
 
    */
 
-  private function obtenerCarpetaRaizPlanAccion($idCliente, $idPlanAccion)
+  public function obtenerCarpetaRaizPlanAccion($idCliente, $idPlanAccion)
 
   {
 
